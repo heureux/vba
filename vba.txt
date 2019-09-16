@@ -1,0 +1,184 @@
+Option Explicit
+
+Sub Make_Click()
+With Sheet1
+    .Columns(1).ColumnWidth = 20
+    .Columns(2).ColumnWidth = 20
+    .Columns(3).ColumnWidth = 40
+    .Cells.RowHeight = 18.75
+    Dim dic As Object, dicKey As String
+    Set dic = CreateObject("Scripting.Dictionary")
+    Dim eMes(2) As String
+    Dim i As Long, j As Long
+    Dim strMessage() As Variant
+    i = 1
+    Do While .Cells(i, 1).value <> ""
+        dicKey = .Cells(i, 1).value
+        If dicKey <> "" Then
+            If dic.Exists(dicKey) Then
+                strMessage = SplitMessages(.Cells(i, 3).value, "受領テキスト")
+                eMes(0) = strMessage(0)
+                eMes(1) = dic.Item(dicKey)(1) & strMessage(1)
+                eMes(2) = strMessage(2)
+                
+                dic.Item(dicKey) = eMes
+            Else
+                strMessage = SplitMessages(.Cells(i, 3).value, "受領テキスト")
+                dic.Add dicKey, strMessage
+            End If
+        End If
+        i = i + 1
+    Loop
+    Call MakeText(dic)
+End With
+End Sub
+Sub MakeText(dic As Variant)
+Dim file As String
+Dim Path As String
+Dim objFso As Object
+Dim Item As Variant
+Set objFso = CreateObject("Scripting.FileSystemObject")
+
+With CreateObject("ADODB.Stream")
+    For Each Item In dic
+        Path = objFso.buildpath(ThisWorkbook.Path, "tmp")
+        Path = objFso.buildpath(Path, Item & ".txt")
+    
+        .Charset = "UTF-8"
+        .Open
+        .WriteText dic.Item(Item)(0) & dic.Item(Item)(1) & dic.Item(Item)(2), 1
+        .SaveToFile Path, 2
+        .Close
+    Next
+    
+End With
+Set objFso = Nothing
+End Sub
+Function SplitMessages(text As String, StartKeyText As String) As Variant
+    Dim RE As Object
+    Dim regEx As Object, Matches  As Object, Match As Object
+
+    Set RE = CreateObject("VBScript.RegExp")
+
+    
+
+    With RE
+        .Pattern = "([\s\S]+?)(" & StartKeyText & ".+?\n)([\s\S]+)"
+        .IgnoreCase = False
+        .Global = True
+    End With
+    
+    Dim strText(2) As Variant
+    Set Matches = RE.Execute(text)
+    If Matches.Count = 1 Then
+        strText(0) = Matches(0).submatches(0)
+        strText(1) = Matches(0).submatches(1)
+        strText(2) = Matches(0).submatches(2)
+    End If
+   SplitMessages = strText()
+End Function
+Function ExistsAtRange(Target As Range) As Boolean
+Dim InputRange As Range
+
+Set InputRange = Union(Range("社員番号"), Range("名前"), Range("機種名"), Range("VLAN"), Range("BIOSパスワード"), Range("HDDパスワード"), Range("アカウントID"), Range("ログインパスワード"))
+If Intersect(Target(1, 1), InputRange) Is Nothing Then ExistsAtRange = True
+
+End Function
+Sub SQL_Click()
+ With CreateObject("Forms.TextBox.1")
+    .MultiLine = True
+    .text = "お手数ですが" & vbCrLf & "パスワードを確認の上" & vbCrLf & "再送信して下さい"
+    .SelStart = 0
+    .SelLength = .TextLength
+    .Copy
+  End With
+  Call LoadCSV("E:\Downloads\input.csv")
+End Sub
+
+Function LoadCSV(filePath As String, hasHeading As Boolean) As Variant
+Dim buf As String, Target As String, i As Long
+Dim tmp As Variant, j As Long
+Dim Items As New Collection
+
+    Target = filePath
+    With CreateObject("ADODB.Stream")
+        .Charset = "SHIFT-JIS" 'UTF-8
+        .Open
+        .LoadFromFile Target
+        .ReadText -2    'ダミーで1行読んでる
+        Do Until .EOS
+            buf = .ReadText(-2)
+'            i = i + 1
+            tmp = Split(buf, ",")
+            
+            Dim obj As Personal
+            Set obj = New Personal
+            obj.Number = tmp(0)
+            obj.Name = tmp(1)
+            obj.Code = tmp(2)
+            obj.Position = tmp(3)
+            obj.Department = tmp(4)
+            Items.Add obj
+        Loop
+        .Close
+    End With
+    
+    MsgBox Items.Count
+End Function
+
+
+
+
+
+
+
+
+
+
+
+
+Option Explicit
+Const BIOS_PASSWORD As String = "（現在のBIOSパスワード）"
+Const HDD_PASSWORD As String = "（現在のHDDパスワード）"
+
+Private Sub Worksheet_Change(ByVal Target As Range)
+On Error GoTo Finally
+Dim InputRange As Range
+
+Set InputRange = Union(Range("社員番号"), Range("名前"), Range("機種名"), Range("VLAN"), Range("BIOSパスワード"), Range("HDDパスワード"), Range("アカウントID"), Range("ログインパスワード"))
+If Intersect(Target(1, 1), InputRange) Is Nothing Then Exit Sub
+Application.EnableEvents = False
+
+MsgBox Target.MergeArea.Address
+GoTo Finally
+Finally:
+Application.EnableEvents = True
+End Sub
+
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+
+If Target.Address = Range("ReBIOSパスワード").MergeArea.Address Or Target.Address = Range("ReHDDパスワード").MergeArea.Address Then
+Application.EnableEvents = False
+    If Target(1, 1).value = BIOS_PASSWORD Or Target(1, 1).value = HDD_PASSWORD Then
+        Target(1, 1).value = ""
+        Application.SendKeys ("{F2}")
+    End If
+Application.EnableEvents = True
+End If
+End Sub
+Sub ReSetup_Click()
+Application.EnableEvents = False
+With Sheet3
+    If Sheet3.Range("インストール").value = 2 Then
+        If .Range("ReBIOSパスワード").value = "" Then .Range("ReBIOSパスワード") = BIOS_PASSWORD
+        If .Range("ReHDDパスワード").value = "" Then .Range("ReHDDパスワード") = HDD_PASSWORD
+    Else
+        If .Range("ReBIOSパスワード").value = BIOS_PASSWORD Then .Range("ReBIOSパスワード") = ""
+        If .Range("ReHDDパスワード").value = HDD_PASSWORD Then .Range("ReHDDパスワード") = ""
+        
+    End If
+End With
+Application.EnableEvents = False
+
+End Sub
+
