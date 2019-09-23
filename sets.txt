@@ -1,0 +1,725 @@
+Option Explicit
+Private Declare Sub Sleep Lib "Kernel32" (ByVal ms As Long)
+Private My_IeEvent As clsIeEvent
+Private My_IeEvent2 As clsIeEvent
+Private lngCellY As Long
+Sub test()
+
+lngCellY = 1
+'InternetExplorerオブジェクトを作成。第2引数にイベントのプリフィックスを指定。
+Dim objIE As InternetExplorer
+Set objIE = New InternetExplorer
+'Dim My_IeEvent As clsIeEvent
+Set My_IeEvent = New clsIeEvent
+Call My_IeEvent.Init(objIE)
+
+
+
+Dim objIE2 As InternetExplorer
+Set objIE2 = New InternetExplorer
+'Dim My_IeEvent2 As clsIeEvent
+
+Set My_IeEvent2 = New clsIeEvent
+My_IeEvent2.CompleteAtProcedure = "comp"
+Call My_IeEvent2.Init(objIE2)
+objIE2.Visible = True
+objIE2.navigate "https://yahoo.co.jp"
+Set objIE2 = Nothing
+
+'VisibleプロパティをTrueにして可視状態にする
+objIE.Visible = True
+
+'Navigateメソッドで＠ITのトップページにアクセス
+objIE.navigate "https://google.co.jp"
+
+'無限ループを回す。
+'Do
+'    Sleep 100
+'    DoEvents
+'Loop
+Debug.Print "モジュールは終了"
+End Sub
+Sub comp()
+    MsgBox "comptest"
+End Sub
+
+
+Sub test2()
+Dim strPath As String
+Dim retval As Variant
+
+    strPath = "C:\Users\Kazuya\Desktop\back.vbs"
+    retval = Shell("WScript.exe """ & strPath & """" & " " & ThisWorkbook.FullName)
+End Sub
+
+Public Sub Test3()
+    MsgBox "成功!!"
+End Sub
+
+Sub Sample1()
+    Dim Ref, buf As String
+    For Each Ref In ActiveWorkbook.VBProject.References
+        buf = buf & Ref.Name & vbTab & Ref.Description & vbCrLf
+    Next Ref
+    MsgBox buf
+End Sub
+Sub LogOutput(pDisp As Object, URL As Variant, strEvent As String)
+        Worksheets("Log").Cells(lngCellY, 1) = strEvent
+        Worksheets("Log").Cells(lngCellY, 2) = pDisp
+        Worksheets("Log").Cells(lngCellY, 3) = URL
+        Worksheets("Log").Cells(lngCellY, 4) = Time
+        
+    lngCellY = lngCellY + 1
+End Sub
+
+Sub testCall(IE As InternetExplorer)
+    Debug.Print "要素数：" & IE.document.All.Length
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Option Explicit
+
+
+Type ubin
+    PostCode As String
+    PrefectureCode As String
+    CityCode As String
+    TownCode As String
+    Post As String
+    flgBiz As String
+    flgBolish As String
+    Prefecture As String
+    PrefectureKana As String
+    City As String
+    CityKana As String
+    Town As String
+    TownKana As String
+    TownRepletion As String
+    Kyoto As String
+    DistrictNo As String
+    DistrictNoKana As String
+    DistrictNoRepletion As String
+    BizName As String
+    BizNameKana As String
+    BizAddress As String
+    NewAddress As String
+    
+End Type
+Enum Color
+    Red = 1   ' 001
+    Green = 2 ' 010
+    Blue = 4  ' 100
+    White = 8 ' 1000
+    Yellow = 16 '10000
+    Black = 32 '100000
+    Gold = 64   '1000000
+    Brown = 128 '10000000
+    
+End Enum
+
+Sub Macro2()
+'
+' Macro2 Macro
+'
+
+'
+Dim myDic As Object
+Set myDic = CreateObject("Scripting.Dictionary")
+myDic.Add "Red", 1
+myDic.Add "Green", 2
+myDic.Add "Blue", 4
+Dim max_n As Long
+Debug.Print Time
+
+Dim ary() As Variant
+ary = Array("Black", "Red", "Green", "Blue", "White")
+Dim i As Long, bit As Long
+On Error Resume Next
+For i = 0 To UBound(ary)
+    bit = myDic.Item(ary(i)) Or bit
+Next i
+On Error GoTo 0
+Debug.Print bit
+Dim path1 As String, path2 As String
+path1 = "E:\Downloads\csv_zenkoku\zenkoku.csv"
+path2 = "E:\Downloads\csv_zenkoku\zenkoku2.csv"
+Dim objF As Object
+SWStart
+With CreateObject("Scripting.FileSystemObject").OpenTextFile(path1, 8)
+    Debug.Print .Line + (.Column = 1)
+        Debug.Print .Column = 1
+    max_n = .Line + (.Column = 1)
+    .Close
+End With
+'Debug.Print CreateObject("Scripting.FileSystemObject").OpenTextFile(path1, 8).Line 'ファイルの行数取得
+Debug.Print Color.Blue Or Color.Red Or Color.Green Or Color.Black
+SWStop
+SWShow "Intrger加算："
+SWStart
+With CreateObject("Scripting.FileSystemObject").OpenTextFile(path2, 8)
+    Debug.Print .Line + (.Column = 1)
+    Debug.Print .Column = 1
+End With
+
+'Debug.Print CreateObject("Scripting.FileSystemObject").OpenTextFile(path2, 8).Line 'ファイルの行数取得
+SWStop
+SWShow "Intrger加算："
+
+
+'Dim aryPost As Variant
+'Debug.Print "ここから計測開始 配列 " & Time
+'SWStart
+'
+'Call ReadCSVArray(path1, max_n)
+'SWStop
+'SWShow "CSVの読み込み完了：" & Time
+
+Debug.Print "ここから計測開始 Collection " & Time
+SWStart
+
+'Call ReadCSVCollection(path1)
+'SWStop
+'SWShow "CSVの読み込み完了：" & Time
+'
+'
+'Debug.Print "ここから計測開始 構造体 " & Time
+'SWStart
+'
+'Call ReadCSVType(path1, max_n)
+'SWStop
+'SWShow "CSVの読み込み完了：" & Time
+'
+'Debug.Print "ここから計測開始 クラス " & Time
+'SWStart
+'
+'Call ReadCSVClass(path1, max_n)
+'SWStop
+'SWShow "CSVの読み込み完了：" & Time
+'
+
+SWStart
+
+With New CsvReader
+    .Init path1, False, ShiftJIS
+    Debug.Print .ToCollection().Count
+End With
+SWStop
+SWShow "CSVreader："
+
+End Sub
+Sub ReadCSVCollection(file)
+    Dim buf As String, tmp As Variant
+    Dim i As Long, n As Long, val As Long, j As Long
+    Dim ary(21) As String
+    Dim csvList As Collection
+    Set csvList = New Collection
+    Dim strbulk As String, Lines As Variant, lineCnt As Long, lastLine As String
+  With CreateObject("ADODB.Stream")
+        .Charset = "Shift_JIS"
+        .Open
+        .LoadFromFile file
+'        Do Until .EOS
+'            buf = .ReadText(-2)
+'            tmp = Split(buf, ",")
+'
+'            csvList.Add tmp
+'        Loop
+
+
+
+        Do Until .EOS
+            strbulk = .ReadText(2048) '2048文字毎に読み込み
+            Lines = Split(strbulk, vbLf) 'CRLFで区切ると、2048文字でCRとLFが分断された時に区切れない
+             
+            lineCnt = UBound(Lines)
+             
+            ' 前回ループの最終行を今回ループの最初の行と結合する
+            Lines(0) = lastLine + Lines(0)
+                     
+            For i = 0 To (lineCnt - 1)
+                Lines(i) = Replace(Lines(i), vbCr, "") 'LFで区切っているためCRは削除
+                Lines(i) = Replace(Lines(i), """", "")
+                tmp = Split(Lines(i), ",")
+                csvList.Add tmp
+            Next
+            
+            
+
+            lastLine = Lines(lineCnt) '最終行は次ループへ持ち越し
+        Loop
+        .Close
+    End With
+    Debug.Print "Listの件数は ->" & csvList.Count
+    Dim Item As Variant
+    For Each Item In csvList
+        If Item(9) = "西牟婁郡すさみ町" Then Debug.Print Item(11)
+    Next
+End Sub
+Sub ReadCSVArray(file, max_n)
+  Dim buf As String, tmp As Variant
+  Dim i As Long, n As Long, val As Long, j As Long
+
+    ReDim ary(max_n - 1, 21) As Variant '取得した行数で2次元配列の再定義
+  With CreateObject("ADODB.Stream")
+        .Charset = "Shift_JIS"
+        .Open
+        .LoadFromFile file
+        Do Until .EOS
+            buf = .ReadText(-2)
+            tmp = Split(buf, ",")
+            For j = 0 To UBound(tmp)
+                ary(i, j) = tmp(j)
+            Next j
+            i = i + 1
+
+        Loop
+        .Close
+    End With
+
+End Sub
+
+Sub ReadCSVType(file, max_n)
+Dim ary As Variant, ubin As ubin
+Dim i As Long, n As Long
+Dim buf As String, tmp As Variant
+ReDim ary(max_n - 1) As Variant '取得した行数で2次元配列の再定義
+  'CSVファイルを配列へ
+  i = 0
+  Open file For Input As #1 'CSVファイルを開く
+  Do Until EOF(1) '最終行までループ
+    Line Input #1, buf '読み込んだデータを1行ずつみていく
+    tmp = Split(buf, ",") 'カンマで分割
+      With ubin
+        .PostCode = tmp(0)
+        .PrefectureCode = tmp(1)
+        .CityCode = tmp(2)
+        .TownCode = tmp(3)
+        .Post = tmp(4)
+        .flgBiz = tmp(5)
+        .flgBolish = tmp(6)
+        .Prefecture = tmp(7)
+        .PrefectureKana = tmp(8)
+        .City = tmp(9)
+        .CityKana = tmp(10)
+        .Town = tmp(11)
+        .TownKana = tmp(12)
+        .TownRepletion = tmp(13)
+        .Kyoto = tmp(14)
+        .DistrictNo = tmp(15)
+        .DistrictNoKana = tmp(16)
+        .DistrictNoRepletion = tmp(17)
+        .BizName = tmp(18)
+        .BizNameKana = tmp(19)
+        .BizAddress = tmp(20)
+        .NewAddress = tmp(21)
+      End With
+      ary(i) = tmp '分割した内容を配列の項目へ入れる（0→ID, 1→名称, 2→値）
+        i = i + 1
+  Loop
+  Close #1 'CSVファイルを閉じる
+
+End Sub
+Sub ReadCSVClass(file, max_n)
+Dim ary As Variant, ubin As ubin
+Dim buf As String, tmp As Variant
+Dim i As Long, n As Long
+
+ReDim ary(max_n - 1) As Variant '取得した行数で2次元配列の再定義
+  'CSVファイルを配列へ
+  i = 0
+  Open file For Input As #1 'CSVファイルを開く
+  Do Until EOF(1) '最終行までループ
+    Line Input #1, buf '読み込んだデータを1行ずつみていく
+    tmp = Split(buf, ",") 'カンマで分割
+      With New UbinData
+        .PostCode = tmp(0)
+        .PrefectureCode = tmp(1)
+        .CityCode = tmp(2)
+        .TownCode = tmp(3)
+        .Post = tmp(4)
+        .flgBiz = tmp(5)
+        .flgBolish = tmp(6)
+        .Prefecture = tmp(7)
+        .PrefectureKana = tmp(8)
+        .City = tmp(9)
+        .CityKana = tmp(10)
+        .Town = tmp(11)
+        .TownKana = tmp(12)
+        .TownRepletion = tmp(13)
+        .Kyoto = tmp(14)
+        .DistrictNo = tmp(15)
+        .DistrictNoKana = tmp(16)
+        .DistrictNoRepletion = tmp(17)
+        .BizName = tmp(18)
+        .BizNameKana = tmp(19)
+        .BizAddress = tmp(20)
+        .NewAddress = tmp(21)
+         Set ary(i) = .Self '分割した内容を配列の項目へ入れる（0→ID, 1→名称, 2→値）
+              End With
+    i = i + 1
+  Loop
+  Close #1 'CSVファイルを閉じる
+
+End Sub
+
+Sub SetType(ary)
+    
+End Sub
+Sub setClass(ary)
+
+End Sub
+Function NumberOfLines(file)
+Dim TStream
+Set TStream = CreateObject("Scripting.FileSystemObject").OpenTextFile(file)
+Do While Not TStream.AtEndOfStream
+  TStream.Skip 1073741824
+Loop
+NumberOfLines = TStream.Line + (TStream.Column = 1)
+End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Option Explicit
+Declare Function QueryPerformanceCounter Lib "Kernel32" _
+                           (X As Currency) As Boolean
+Declare Function QueryPerformanceFrequency Lib "Kernel32" _
+                           (X As Currency) As Boolean
+Dim Freq As Currency
+Dim Overhead  As Currency
+Dim Ctr1 As Currency, Ctr2 As Currency, Result As Currency
+'// ミリ秒以下の高精度で処理時間計測関数
+'// 引数    ：(IN)  配列変数
+'// 戻り値  ：Boolean 初期化済み＝True、未初期化＝False
+Public Sub SWStart()
+    If QueryPerformanceCounter(Ctr1) Then
+        QueryPerformanceCounter Ctr2
+        QueryPerformanceFrequency Freq
+'        Debug.Print "QueryPerformanceCounter minimum resolution: 1/" & _
+'                    Freq * 10000; " sec"
+'        Debug.Print "API Overhead: "; (Ctr2 - Ctr1) / Freq * 1000; "ミリ秒"
+        Overhead = Ctr2 - Ctr1
+    Else
+        Err.Raise 513, "StopwatchError", "High-resolution counter not supported."
+    End If
+    QueryPerformanceCounter Ctr1
+End Sub
+
+Public Sub SWStop()
+    QueryPerformanceCounter Ctr2
+    Result = (Ctr2 - Ctr1 - Overhead) / Freq * 1000
+End Sub
+
+Public Sub SWShow(Optional Caption As String)
+    Debug.Print Caption & " " & Result
+End Sub
+
+
+'// 配列初期化判定関数
+'// 引数    ：(IN)  配列変数
+'// 戻り値  ：Boolean 初期化済み＝True、未初期化＝False
+Function IsInitArray(ary()) As Boolean
+    If Sgn(ary) <> 0 Then
+        IsInitArray = True
+    Else
+        IsInitArray = False
+    End If
+End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Option Explicit
+'clsIeEvent
+Private WithEvents My_IeEvent As InternetExplorer
+
+Public Finished     As Boolean
+Public text As String
+Public CompleteAtProcedure As String
+
+Public Sub Init(ByVal In_IeObj As InternetExplorer)
+ 
+    Set My_IeEvent = In_IeObj
+ 
+End Sub
+
+Private Sub Class_Terminate()
+    Debug.Print "Terminate"
+End Sub
+
+Private Sub My_IeEvent_DocumentComplete(ByVal pDisp As Object, URL As Variant)
+'    text = My_IeEvent.LocationName
+'    Debug.Print Time & " - DocumentComplete : " & My_IeEvent.LocationName & " - " & URL
+'    Call LogOutput(pDisp, URL, "DocumentComplete")
+'    Call testCall(My_IeEvent)
+    
+    
+    On Error Resume Next
+    
+    If pDisp Is Nothing Then  '②
+        Debug.Print "browser.Document is nothing."
+    Else
+        Debug.Print "browser.Document.body.innerhtml : " & pDisp.document.Title
+    End If
+    
+    On Error GoTo 0
+    
+    If pDisp Is My_IeEvent Then  '①
+        Debug.Print "IE_All_DocumentComplete"
+        On Error Resume Next
+        Application.Run Me.CompleteAtProcedure
+        On Error GoTo 0
+    End If
+    
+End Sub
+
+Private Sub My_IeEvent_NavigateComplete2(ByVal pDisp As Object, URL As Variant)
+    Debug.Print "Navi2 : " & URL
+End Sub
+
+Sub My_IeEvent_OnQuit()
+    Debug.Print "Internet Explorerが閉じられました。"
+
+    'オブジェクトの破棄
+    Set My_IeEvent = Nothing
+
+End Sub
+Public Property Get Self() As clsIeEvent
+    Set Self = Me
+End Property
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+''' <summary>
+''' CsvReader
+''' </summary>
+Option Explicit
+'ファイルのバッファサイズ
+Private Const BUF_SIZE As Integer = 2048
+
+
+'ストリーム
+Private objStream As Object
+
+'最終行
+Private lastLine As String
+Private fskipLine As Boolean
+Private strFilepath As String
+Private emCharset As Charset
+
+Private colData As Collection
+Private ary As String
+
+'文字コード
+Public Enum Charset
+    UTF8 = 1
+    ShiftJIS = 2
+End Enum
+
+Private Sub Class_Initialize()
+    Set objStream = CreateObject("ADODB.Stream")
+    strFilepath = ""
+    fskipLine = False
+    emCharset = UTF8
+End Sub
+
+Public Sub Init(strFilePathText As String, blFisrtLinSkip As Boolean, typeCharset As Charset)
+    strFilepath = strFilePathText
+    fskipLine = blFisrtLinSkip
+    emCharset = typeCharset
+End Sub
+Property Let FilePath(ByVal strFilePathText As String)
+    strFilepath = strFilePathText
+End Property
+Property Let FirstLineSkip(ByVal blFisrtLinSkip As Boolean)
+    fskipLine = blFisrtLinSkip
+End Property
+Property Let Charset(ByVal typeCharset As Charset)
+    emCharset = typeCharset
+End Property
+Property Get Self() As Object
+    Set Self = Me
+End Property
+Function ToCollection() As Collection
+    If Not colData Is Nothing Then
+        Set ToCollection = colData
+        Exit Function
+    End If
+    Set colData = New Collection
+    
+    Dim buf As String, tmp As Variant
+    Dim i As Long, n As Long, val As Long, j As Long
+    Dim ary(21) As String
+    Dim csvList As Collection
+    Set csvList = New Collection
+    Dim strbulk As String, Lines As Variant, lineCnt As Long, lastLine As String
+  With CreateObject("ADODB.Stream")
+        Select Case emCharset
+            Case UTF8
+                .Charset = "UTF-8"
+            Case ShiftJIS
+                .Charset = "Shift_JIS"
+            Case Else
+                .Charset = "UTF-8"
+        End Select
+        .Open
+        .LoadFromFile strFilepath
+
+        Do Until .EOS
+            strbulk = .ReadText(BUF_SIZE) '2048文字毎に読み込み
+            Lines = Split(strbulk, vbLf) 'CRLFで区切ると、2048文字でCRとLFが分断された時に区切れない
+             
+            lineCnt = UBound(Lines)
+             
+            ' 前回ループの最終行を今回ループの最初の行と結合する
+            Lines(0) = lastLine + Lines(0)
+                     
+            For i = 0 To (lineCnt - 1)
+                Lines(i) = Replace(Lines(i), vbCr, "") 'LFで区切っているためCRは削除
+                Lines(i) = Replace(Lines(i), """", "")
+                tmp = Split(Lines(i), ",")
+                csvList.Add tmp
+            Next
+            
+            
+            
+            lastLine = Lines(lineCnt) '最終行は次ループへ持ち越し
+        Loop
+        .Close
+    End With
+'    Debug.Print "Listの件数は ->" & csvList.Count
+'    Dim Item As Variant
+'    For Each Item In csvList
+'        If Item(9) = "西牟婁郡すさみ町" Then Debug.Print Item(11)
+'    Next
+    Set ToCollection = csvList
+End Function
+
+Private Sub Class_Terminate()
+    Set objStream = Nothing
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+if WScript.Arguments.Count <> 1 then WScipt.quit()
+
+dim fileName
+fileName = WScript.Arguments(0)
+Path=WScript.Arguments(0)
+On Error Resume Next
+Set Application=GetObject(,"Excel.Application")
+On Error GoTo 0
+If IsEmpty(Application) Then
+  MsgBox "No App"
+Else
+  Count=Application.Workbooks.Count
+  Set Book1=GetObject(Path)
+  If Count<>Application.Workbooks.Count Then
+    MsgBox "Not Open"
+  ElseIf Book1.Application Is Application Then
+    MsgBox "Open here"
+	Set sheet = Book1.WorkSheets.Item(1)
+	sheet.Cells(1, 1) = "入力"
+	Book1.Application.Run "Module2.Test3"
+  Else
+    MsgBox "Open elsewhere"
+  End If
+End If
